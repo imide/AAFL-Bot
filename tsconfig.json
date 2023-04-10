@@ -20,6 +20,7 @@
         "sourceMap": false,
         "baseUrl": "./",
         "strictFunctionTypes": false,
+        "strictBindCallApply": false,
     },
     "files": [
         "src/main.ts"
