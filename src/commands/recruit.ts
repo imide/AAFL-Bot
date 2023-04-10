@@ -55,37 +55,56 @@ export async function execute(interaction: { options: { getUser: (arg0: string) 
     const button = require('../interactions/buttons/userRecruitConfirm');
     const channel = await member.createDM(); 
     
+    
+
 
     const userRecruitDM = new EmbedBuilder()
     .setAuthor({ name: 'AAFL Recruitment Manager', iconURL: 'https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png' })
     .setTitle('Offer received!')
-    .setDescription(`You have been offered a spot on the **${team.name}** within the AAFL! To confirm the transaction, please click the button below. Otherwise, you can either ignore this message or click the deny button. \n\n **This offer will expire in 24 hours.**`)
+    .setDescription(`You have been offered a spot on the **${team.string}** within the AAFL! To confirm the transaction, please click the button below. Otherwise, you can either ignore this message or click the deny button. \n\n **This offer will expire in 24 hours.**`)
     .setFooter({ text: 'AAFL Recruitment Manager' })
     .setColor(0x0099FF)
     .setTimestamp();
     const confirmedRecruitment = new EmbedBuilder()
     .setAuthor({ name: 'AAFL Recruitment Manager', iconURL: 'https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png' })
     .setTitle('Offer sent!')
-    .setDescription(`You have offered a spot on the **${team.name}** to ${member.username}. They will be sent a message shortly.`)
+    .setDescription(`You have offered a spot on the **${team.string}** to ${member.username}. They will be sent a message shortly.`)
     .setFooter({ text: 'AAFL Recruitment Manager' })
     .setColor(0x0099FF)
     .setTimestamp();
 
+    const ownerRecruitConfirmed - new EmbedBuilder()
+    .setAuthor({ name: 'AAFL Recruitment Manager', iconURL: 'https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png' })
+    .setTitle('Offer accepted by user!')
+    .setDescription(`Your offer to **${member.username}** for the team **${team.string}** was accepted by the user! Don't forget to log this transaction.`)
+    .setFooter({ text: 'AAFL Recruitment Manager' })
+    .setColor(0x0099FF)
+    .setTimestamp();
+        
+
     const userRecruitConfirmed = new EmbedBuilder()
     .setAuthor({ name: 'AAFL Recruitment Manager', iconURL: 'https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png' })
     .setTitle('Offer confirmed!')
-    .setDescription(`You have confirmed your offer to join the **${team.name}**! You will be sent an invite link to the team server shortly. \n\n **Please screenshot this message and send the image to your coach.**`)
+    .setDescription(`You have confirmed your offer to join the **${team.string}**! You will be sent an invite link to the team server shortly. \n\n **Please screenshot this message and send the image to your coach.**`)
 
     //: Responses 
-    const filter = (i: { customId: string; user: { id: any; }; }) => i.customId === 'userRecruitConfirm' && i.user.id === member.id;
+    const filter = (i) => i.customId === 'userRecruitConfirm' && i.user.id === member.id;
     const collector = channel.createMessageComponentCollector({ filter, time: 864000 });
 
     await member.send({ embeds: [userRecruitDM], components: [button.button] });
     await interaction.reply({ embeds: [confirmedRecruitment], ephemeral: true });   
    
-    collector.on('collect', async (i: { update: (arg0: { embeds: EmbedBuilder[]; components: never[]; }) => any; }) => {
+    collector.on('collect', async (i) => {
         await i.update ({ embeds: [userRecruitConfirmed], components: [] });
         await member.roles.add(teamRole);
-        await member.send(`Here is your invite link to the ${team.name} server: ${invite}`);
+        await member.send(`Here is your invite link to the ${team.string} server: ${invite}`);
+        await interaction.user.send({ embeds: [ownerRecruitConfirmed]})
     });
+
+    collector.on('exit', async (i) =>
+    await i.update ({ content: 'This offer has expired.'})
+    await interaction.user.send(`Your offer to ${member.username} for the ${team.string} was denied or has expired.`)
+    )
 }
+
+
