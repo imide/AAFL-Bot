@@ -21,6 +21,7 @@
         "baseUrl": "./",
         "strictFunctionTypes": false,
         "strictBindCallApply": false,
+        "noImplicitAny": false,
     },
     "files": [
         "src/main.ts"
