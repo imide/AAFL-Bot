@@ -35,14 +35,20 @@ export const data = new SlashCommandBuilder()
         .setAutocomplete(true)
         )
 
-
 export async function execute(interaction: ChatInputCommandInteraction) {
+    
+    if (interaction.inCachedGuild()) {
+
     const member = interaction.options.getMember('user')!;
     const teamName = interaction.options.getString('team')!;
     const seasons = interaction.options.getNumber('seasons')!;
     const guild = interaction.guild!;
     const teamRole = guild.roles.cache.find(role => role.name === teamName)!;
-    const button = require(../)
+    const button = require('../interactions/buttons/userRecruitConfirm')
+    const channel = member.user.dmChannel || await member.user.createDM()
+    
+
+   
 
     if (member.roles.cache.some((role: { name: string; }) => role.name === teamRole.name)) {
         const error1 = new EmbedBuilder()
@@ -62,7 +68,22 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         .setTitle('Recruitment Request')   
         .setColor('#00ff00')
         .setDescription(`The coach of the ${teamName} is interested in recruiting you to their team! You can accept by clicking the button below.\n\n **This offer will expire in 24 hours.**`)
-        .setFooter(content: `This request was sent on behalf of ${interaction.user.username}`, iconURL: `${interaction.user.avatarURL()}`)
+        .setTimestamp()
+        await member.send({ embeds: [request], components: [button] })
+        const collector = channel.createMessageComponentCollector({ time: 864000 })
+        collector.on('collect', async i => {
+            if (i.customId === 'userRecruitConfirm') {
+                await i.update({ content: `You have accepted the offer to join the ${teamName} for ${seasons} season/s.`, components: [] })
+                await member.roles.add(teamRole)
+                const success2 = new EmbedBuilder()
+                .setTitle('Success')
+                .setColor('#00ff00')
+                .setDescription(`Successfully recruited ${member} to the ${teamName} for ${seasons} season/s.`)
+                .setTimestamp()
+                await interaction.followUp({ embeds: [success2] })
+            }
+        }
+        )
 
 
     }
@@ -70,4 +91,4 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
     
 }
-     
+}
