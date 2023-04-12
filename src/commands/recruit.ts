@@ -5,6 +5,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  TextChannel,
 } from "discord.js";
 
 export const data = new SlashCommandBuilder()
@@ -45,8 +46,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const guild = interaction.guild!;
     const teamRole = guild.roles.cache.find((role) => role.name === teamName)!;
     const channel = member.user.dmChannel || (await member.user.createDM());
+    const transactionsChannel = guild.channels.cache.find(c => c.name === "transactions") as TextChannel;
 
-    console.log(teamRole, teamName);
+    console.log(member, teamName);
 
 
     const userRecruitDM = new EmbedBuilder()
@@ -84,7 +86,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       })
       .setTitle("Offer accepted by user!")
       .setDescription(
-        `Your offer to **${member}** for the team **${teamName}** was accepted by the user! Don't forget to log this transaction.`
+        `Your offer to **${member}** for the team **${teamName}** was accepted by the user!`
       )
       .setFooter({ text: "AAFL Recruitment Manager" })
       .setColor(0x0099ff)
@@ -109,6 +111,21 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       )
       .setTimestamp();
 
+      const transactionConfirmed = new EmbedBuilder()
+      .setAuthor({name: `AAFL Transaction Manager`, iconURL: `https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png`})
+      .setTitle(`Transaction Confirmed`)
+      .setDescription(`**Transaction Notice** 
+      \n\n \n\n 
+      **${teamName}** to recieve: **${member}** 
+      \n\n 
+      **Total Players:** ${interaction.guild?.roles.cache.find((role) => role.name === teamName)?.members.size}
+      \n\n
+      **Transaction Type:** \`Free Agent Recruitment\` 
+      \n\n 
+      **Transaction Status:** \`Confirmed\``)
+      .setColor(`#0099ff`)
+      .setTimestamp()
+      
       const button = new ActionRowBuilder<ButtonBuilder>()
       .addComponents(
         new ButtonBuilder()
@@ -135,7 +152,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       collector.on("collect", async (i) => {
         if (i.customId === "userRecruitConfirm") {
           await member.roles.add(teamRole);
-          await interaction.user.send({ embeds: [userRecruitConfirmed] });
+          await member.send({ embeds: [userRecruitConfirmed] });
+          await interaction.user.send({ embeds: [ownerRecruitConfirmed] });
+          await transactionsChannel!.send({ embeds: [transactionConfirmed] });
+          
         }
       });
 
@@ -149,7 +169,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
                 content: `This offer has expired/was denied by the user.`,
           });
         }
-        });
+      }
+    )
+    ;
   }
 }
 }
