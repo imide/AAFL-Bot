@@ -42,6 +42,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const seasons = interaction.options.getNumber('seasons')!;
     const guild = interaction.guild!;
     const teamRole = guild.roles.cache.find(role => role.name === teamName)!;
+    const button = require(../)
 
     if (member.roles.cache.some((role: { name: string; }) => role.name === teamRole.name)) {
         const error1 = new EmbedBuilder()
@@ -50,7 +51,22 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         .setDescription('This user is already on a team. Check the players roles or initiate a trade.')
         .setTimestamp()
         await interaction.reply({ embeds: [error1], ephemeral: true })
+    } else { 
+        const success = new EmbedBuilder()
+        .setTitle('Success')
+        .setColor('#00ff00')
+        .setDescription(`Requested the recruitment of ${member} to the ${teamName} for ${seasons} season/s. They are recieving their request now.`)
+        .setTimestamp()
+        await interaction.reply({ embeds: [success] })
+        const request = new EmbedBuilder()
+        .setTitle('Recruitment Request')   
+        .setColor('#00ff00')
+        .setDescription(`The coach of the ${teamName} is interested in recruiting you to their team! You can accept by clicking the button below.\n\n **This offer will expire in 24 hours.**`)
+        .setFooter(content: `This request was sent on behalf of ${interaction.user.username}`, iconURL: `${interaction.user.avatarURL()}`)
+
+
     }
+
 
     
 }
