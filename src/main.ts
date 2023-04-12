@@ -1,9 +1,11 @@
-import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { Client, GatewayIntentBits, REST, Routes, Guild } from 'discord.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import { execute as ready } from './listeners/ready';
 
 dotenv.config();
+
+
 
 
 const client = new Client({
