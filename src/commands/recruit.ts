@@ -1,108 +1,155 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, GuildMemberManager } from 'discord.js';
-
+import {
+  SlashCommandBuilder,
+  ChatInputCommandInteraction,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+} from "discord.js";
 
 export const data = new SlashCommandBuilder()
-    .setName('recruit')
-    .setDescription('Recruit someone to your team.')
-    .addMentionableOption(option => 
-        option.setName('user')
-        .setDescription('User of the person to recruit.')
-        .setRequired(true)
-        )
+  .setName("recruit")
+  .setDescription("Recruit a free agent to your team.")
+  .addUserOption((option) =>
+    option
+      .setName("user")
+      .setDescription("User of the person to recruit.")
+      .setRequired(true)
+  )
 
-    .addStringOption(option => 
-        option.setName('team')
-        .setDescription('Team to recruit')
-        .setRequired(true)
-        .addChoices(
-            { name: 'Pittsburgh Steelers', value: 'steelers' },
-            { name: 'New Orleans Saints', value: 'saints' },
-            { name: 'Tampa Bay Buccaneers', value: 'bucs' },
-            { name: 'Buffalo Bills', value: 'bills' },
-            { name: 'Atlanta Falcons', value: 'falcons' },
-            { name: 'New England Patriots', value: 'patriots' },
-            { name: 'Philadelphia Eagles', value: 'eagles' },
-            { name: 'Kansas City Chiefs', value: 'chiefs' },
-            { name: 'Baltimore Ravens', value: 'ravens' },
-            { name: 'San Francisco 49ers', value: '49ers' },
-            { name: 'Seattle Seahawks', value: 'seahawks' },
-            { name: 'Tennessee Titans', value: 'titans' },
-        )
-        )
-        .addStringOption(option =>
-            option.setName('invite_link')
-            .setDescription('Discord invite link to team server.')
-            .setRequired(true)
-            )
-            .addRoleOption(option =>
-                option.setName('team_role')
-                .setDescription('The recruiting team role to assign to the user.')	
-                .setRequired(true)
-            
-                )
-                
-
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles);
-
-   
+  .addStringOption((option) =>
+    option
+      .setName("team")
+      .setDescription("Team to recruit")
+      .setRequired(true)
+      .addChoices(
+        { name: "Pittsburgh Steelers", value: "Pittsburgh Steelers" },
+        { name: "New Orleans Saints", value: "New Orleans Saints" },
+        { name: "Tampa Bay Buccaneers", value: "Tampa Bay Buccaneers" },
+        { name: "Buffalo Bills", value: "Buffalo Bills" },
+        { name: "Atlanta Falcons", value: "Atlanta Falcons" },
+        { name: "New England Patriots", value: "New England Patriots" },
+        { name: "Philadelphia Eagles", value: "Philadelphia Eagles" },
+        { name: "Kansas City Chiefs", value: "Kansas City Chiefs" },
+        { name: "Baltimore Ravens", value: "Baltimore Ravens" },
+        { name: "San Francisco 49ers", value: "San Franciso 49ers" },
+        { name: "Seattle Seahawks", value: "Seattle Seahawks" },
+        { name: "Tennessee Titans", value: "Tennessee Titans" }
+      )
+  )
 
 export async function execute(interaction: ChatInputCommandInteraction) {
+  if (interaction.inCachedGuild()) {
+    const member = interaction.options.getMember("user")!;
+    const teamName = interaction.options.getString("team")!;
+    const guild = interaction.guild!;
+    const teamRole = guild.roles.cache.find((role) => role.name === teamName)!;
+    const channel = member.user.dmChannel || (await member.user.createDM());
 
-    const member = interaction.options.getMember('user')!;
-    const team = interaction.options.get('team');
-    const invite = interaction.options.getString('invite_link')
-    const teamRole = interaction.options.getRole('team_role')!;
-    const button = require('../interactions/buttons/userRecruitConfirm');
-    const channel = await member.user.createDM();
-
+    console.log(teamRole, teamName);
 
 
     const userRecruitDM = new EmbedBuilder()
-    .setAuthor({ name: 'AAFL Recruitment Manager', iconURL: 'https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png' })
-    .setTitle('Offer received!')
-    .setDescription(`You have been offered a spot on the **${team}** within the AAFL! To confirm the transaction, please click the button below. Otherwise, you can either ignore this message or click the deny button. \n\n **This offer will expire in 24 hours.**`)
-    .setFooter({ text: 'AAFL Recruitment Manager' })
-    .setColor(0x0099FF)
-    .setTimestamp();
+      .setAuthor({
+        name: "AAFL Recruitment Manager",
+        iconURL:
+          "https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png",
+      })
+      .setTitle("Offer received!")
+      .setDescription(
+        `You have been offered a spot on the **${teamName}** within the AAFL! To confirm the transaction, please click the button below. Otherwise, you can either ignore this message or click the deny button. \n\n **This offer will expire in 24 hours.**`
+      )
+      .setFooter({ text: "AAFL Recruitment Manager" })
+      .setColor(0x0099ff)
+      .setTimestamp();
     const confirmedRecruitment = new EmbedBuilder()
-    .setAuthor({ name: 'AAFL Recruitment Manager', iconURL: 'https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png' })
-    .setTitle('Offer sent!')
-    .setDescription(`You have offered a spot on the **${team}** to ${member.username}. They will be sent a message shortly.`)
-    .setFooter({ text: 'AAFL Recruitment Manager' })
-    .setColor(0x0099FF)
-    .setTimestamp();
+      .setAuthor({
+        name: "AAFL Recruitment Manager",
+        iconURL:
+          "https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png",
+      })
+      .setTitle("Offer sent!")
+      .setDescription(
+        `You have offered a spot on the **${teamName}** to ${member}. They will be sent a message shortly.`
+      )
+      .setFooter({ text: "AAFL Recruitment Manager" })
+      .setColor(0x0099ff)
+      .setTimestamp();
 
     const ownerRecruitConfirmed = new EmbedBuilder()
-    .setAuthor({ name: 'AAFL Recruitment Manager', iconURL: 'https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png' })
-    .setTitle('Offer accepted by user!')
-    .setDescription(`Your offer to **${member.username}** for the team **${team}** was accepted by the user! Don't forget to log this transaction.`)
-    .setFooter({ text: 'AAFL Recruitment Manager' })
-    .setColor(0x0099FF)
-    .setTimestamp();
-        
+      .setAuthor({
+        name: "AAFL Recruitment Manager",
+        iconURL:
+          "https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png",
+      })
+      .setTitle("Offer accepted by user!")
+      .setDescription(
+        `Your offer to **${member}** for the team **${teamName}** was accepted by the user! Don't forget to log this transaction.`
+      )
+      .setFooter({ text: "AAFL Recruitment Manager" })
+      .setColor(0x0099ff)
+      .setTimestamp();
 
     const userRecruitConfirmed = new EmbedBuilder()
-    .setAuthor({ name: 'AAFL Recruitment Manager', iconURL: 'https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png' })
-    .setTitle('Offer confirmed!')
-    .setDescription(`You have confirmed your offer to join the **${team}**! You will be sent an invite link to the team server shortly. \n\n **Please screenshot this message and send the image to your coach.**`)
+      .setAuthor({
+        name: "AAFL Recruitment Manager",
+        iconURL:
+          "https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png",
+      })
+      .setTitle("Offer confirmed!")
+      .setDescription(
+        `You have confirmed your offer to join the **${teamName}**! You will be sent an invite link to the team server shortly. \n\n **Please do not block this bot from messaging you, just in case!**`
+      );
 
-    //: Responses 
-    const filter = (i) => i.customId === 'userRecruitConfirm' && i.user.id === member.id;
-    const collector = channel.createMessageComponentCollector({ filter, time: 864000 });
+    const error1 = new EmbedBuilder()
+      .setTitle("Error")
+      .setColor("#ff0000")
+      .setDescription(
+        "This user is already on a team. Check the players roles or initiate a trade."
+      )
+      .setTimestamp();
 
-    await member.send({ embeds: [userRecruitDM], components: [button.button] });
-    await interaction.reply({ embeds: [confirmedRecruitment], ephemeral: true });   
-   
-    collector.on('collect', async (i) => {
-        await i.update ({ embeds: [userRecruitConfirmed], components: [] });
-        await member.roles.add(teamRole);
-        await member.send(`Here is your invite link to the ${team} server: ${invite}`);
-        await interaction.user.send({ embeds: [ownerRecruitConfirmed]})
-    });
+      const button = new ActionRowBuilder<ButtonBuilder>()
+      .addComponents(
+        new ButtonBuilder()
+            .setCustomId("userRecruitConfirm")
+            .setLabel("Confirm")
+            .setStyle(ButtonStyle.Success)
+            .setEmoji("✅"),
+      )
+            
 
-    collector.on('exit', async (i) =>
-    await i.update ({ content: 'This offer has expired.'})
-    )
+    if (
+      member.roles.cache.some(
+        (role) => role.name === teamRole.name
+      )
+    ) {
+      await interaction.reply({ embeds: [error1], ephemeral: true });
+
+    } else {
+      await interaction.reply({ embeds: [confirmedRecruitment] });
+      await member.send({ embeds: [userRecruitDM], components: [button] });
+      const collector = channel.createMessageComponentCollector({
+        time: 864000,
+      });
+      collector.on("collect", async (i) => {
+        if (i.customId === "userRecruitConfirm") {
+          await member.roles.add(teamRole);
+          await interaction.user.send({ embeds: [userRecruitConfirmed] });
+        }
+      });
+
+        collector.on("end", async (collected) => {
+          if (collected.size === 0) {
+            await member.send({
+              content: `This offer has expired or was accepted by the user.`,
+              components: [],
+            });
+            interaction.user.send({
+                content: `This offer has expired/was denied by the user.`,
+          });
+        }
+        });
+  }
 }
-
-
+}
