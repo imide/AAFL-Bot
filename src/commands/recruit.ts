@@ -122,7 +122,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       \n\n
       **Transaction Type:** \`Free Agent Recruitment\` 
       \n\n 
-      **Transaction Status:** \`Confirmed\``)
+      **Transaction Status:** \`Confirmed\``)  
       .setColor(`#0099ff`)
       .setTimestamp()
       
