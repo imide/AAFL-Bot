@@ -147,7 +147,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       await interaction.reply({ embeds: [confirmedRecruitment] });
       await member.send({ embeds: [userRecruitDM], components: [button] });
       const collector = channel.createMessageComponentCollector({
-        time: 864000,
+        time: 86400000,
       });
       collector.on("collect", async (i) => {
         if (i.customId === "userRecruitConfirm") {
