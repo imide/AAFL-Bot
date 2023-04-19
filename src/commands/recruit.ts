@@ -115,13 +115,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .setAuthor({name: `AAFL Transaction Manager`, iconURL: `https://cdn.discordapp.com/attachments/1008505934483558421/1094751459972743198/aafl_logo.png`})
       .setTitle(`Transaction Confirmed`)
       .setDescription(`**Transaction Notice** 
-      \n\n \n\n 
       **${teamName}** to recieve: **${member}** 
-      \n\n 
-      **Total Players:** ${interaction.guild?.roles.cache.find((role) => role.name === teamName)?.members.size}
-      \n\n
+      **Total Players:** ${interaction.guild?.roles.cache.find((role) => role.name === teamName)?.members.size! + 1}
       **Transaction Type:** \`Free Agent Recruitment\` 
-      \n\n 
       **Transaction Status:** \`Confirmed\``)  
       .setColor(`#0099ff`)
       .setTimestamp()
@@ -155,6 +151,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           await member.send({ embeds: [userRecruitConfirmed] });
           await interaction.user.send({ embeds: [ownerRecruitConfirmed] });
           await transactionsChannel!.send({ embeds: [transactionConfirmed] });
+          i.update({content: `This offer has expired or was accepted by the user.`, components: []})
           
         }
       });
