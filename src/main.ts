@@ -1,7 +1,7 @@
-import { Client, GatewayIntentBits, REST, Routes, Guild } from 'discord.js';
+import { Client, GatewayIntentBits, REST, Routes, EmbedBuilder } from 'discord.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import { execute as ready } from './listeners/ready';
+import { execute, execute as ready } from './listeners/ready';
 
 dotenv.config();
 
@@ -58,5 +58,6 @@ client.on('interactionCreate', async (interaction) => {
     console.error(error);
   }
 });
+
 
 client.login(process.env.TOKEN);
