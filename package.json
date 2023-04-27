@@ -10,7 +10,8 @@
     "start": "node --enable-source-maps ./dist/main.js",
     "lint": "eslint --fix --ext .ts src",
     "format": "prettier --write --loglevel=warn  \"src/**/*.ts\"",
-    "update": "yarn upgrade-interactive --latest"
+    "update": "yarn upgrade-interactive --latest",
+    "fix": "yarn lint && yarn format"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +32,6 @@
     "typescript": "^5.0.4"
   },
   "devDependencies": {
-    "@types/node": "^18.15.11"
+    "@types/node": "^18.16.1"
   }
 }
