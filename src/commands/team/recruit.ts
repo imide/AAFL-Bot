@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+// NEEDS REWORKING!!! ENTIRE THING!
 import {
 	SlashCommandBuilder,
 	ChatInputCommandInteraction,
